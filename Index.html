@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <?!= include("CSS"); ?>
+
+</head>
+
+<body>
+
+<div class="header">
+
+📚 Books Hub
+
+</div>
+
+<div class="container">
+
+<input
+type="text"
+id="search"
+placeholder="🔍 Search books..."
+onkeyup="searchBooks()">
+
+<div id="books">
+
+Loading Books...
+
+</div>
+
+</div>
+
+<?!= include("JavaScript"); ?>
+
+</body>
+
+</html>

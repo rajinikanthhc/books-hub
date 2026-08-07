@@ -1,0 +1,95 @@
+<script>
+
+let books = [];
+
+// Load Books
+window.onload = function () {
+
+  google.script.run
+    .withSuccessHandler(showBooks)
+    .getBooks();
+
+};
+
+// Display Books
+function showBooks(data){
+
+  books = data;
+
+  let html = "";
+
+  books.forEach(book => {
+
+    html += `
+      <div class="book-card">
+
+        <h3>${book.title}</h3>
+
+        <p>${book.author}</p>
+
+        <small>${book.category} • ${book.language}</small>
+
+        <br><br>
+
+        <button onclick="window.open('${book.pdf}','_blank')">
+          📖 Read
+        </button>
+
+      </div>
+    `;
+
+  });
+
+  document.getElementById("books").innerHTML = html;
+
+}
+
+
+// Search
+function searchBooks(){
+
+  const text =
+    document.getElementById("search")
+    .value
+    .toLowerCase();
+
+  const filtered =
+    books.filter(book =>
+
+      book.title.toLowerCase().includes(text) ||
+
+      book.author.toLowerCase().includes(text)
+
+    );
+
+  let html = "";
+
+  filtered.forEach(book=>{
+
+      html += `
+      <div class="book-card">
+
+        <h3>${book.title}</h3>
+
+        <p>${book.author}</p>
+
+        <small>${book.category} • ${book.language}</small>
+
+        <br><br>
+
+        <button onclick="window.open('${book.pdf}','_blank')">
+
+        📖 Read
+
+        </button>
+
+      </div>
+      `;
+
+  });
+
+  document.getElementById("books").innerHTML = html;
+
+}
+
+</script>
