@@ -14,33 +14,47 @@ window.onload = function () {
 // Display Books
 function showBooks(data){
 
-  books = data;
+    books=data;
 
-  let html = "";
+    let html="";
 
-  books.forEach(book => {
+    books.forEach(book=>{
 
-    html += `
-      <div class="book-card">
+        html+=`
 
-        <h3>${book.title}</h3>
+        <div class="book-card">
 
-        <p>${book.author}</p>
+            <div class="book-icon">📘</div>
 
-        <small>${book.category} • ${book.language}</small>
+            <div class="book-title">${book.title}</div>
 
-        <br><br>
+            <div class="author">${book.author}</div>
 
-        <button onclick="window.open('${book.pdf}','_blank')">
-          📖 Read
-        </button>
+            <div>
 
-      </div>
-    `;
+                <span class="category">${book.category}</span>
 
-  });
+                <span class="language">${book.language}</span>
 
-  document.getElementById("books").innerHTML = html;
+            </div>
+
+            <br>
+
+            <button class="read-btn"
+
+            onclick="window.open('${book.pdf}','_blank')">
+
+            📖 Read
+
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById("books").innerHTML=html;
 
 }
 
