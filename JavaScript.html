@@ -2,7 +2,11 @@
 
 let books = [];
 
-// Load Books
+
+/* =================================
+   LOAD BOOKS
+================================= */
+
 window.onload = function () {
 
   google.script.run
@@ -11,98 +15,123 @@ window.onload = function () {
 
 };
 
-// Display Books
-function showBooks(data){
 
-    books=data;
+/* =================================
+   DISPLAY BOOKS
+================================= */
 
-    let html="";
+function showBooks(data) {
 
-    books.forEach(book=>{
+  books = data;
 
-        html+=`
+  document.getElementById("totalBooks").innerHTML = data.length;
 
-        <div class="book-card">
-
-            <div class="book-icon">📘</div>
-
-            <div class="book-title">${book.title}</div>
-
-            <div class="author">${book.author}</div>
-
-            <div>
-
-                <span class="category">${book.category}</span>
-
-                <span class="language">${book.language}</span>
-
-            </div>
-
-            <br>
-
-            <button class="read-btn"
-
-            onclick="window.open('${book.pdf}','_blank')">
-
-            📖 Read
-
-            </button>
-
-        </div>
-
-        `;
-
-    });
-
-    document.getElementById("books").innerHTML=html;
+  renderBooks(books);
 
 }
 
 
-// Search
-function searchBooks(){
+/* =================================
+   RENDER BOOKS
+================================= */
 
-  const text =
-    document.getElementById("search")
-    .value
-    .toLowerCase();
-
-  const filtered =
-    books.filter(book =>
-
-      book.title.toLowerCase().includes(text) ||
-
-      book.author.toLowerCase().includes(text)
-
-    );
+function renderBooks(list) {
 
   let html = "";
 
-  filtered.forEach(book=>{
+  list.forEach(book => {
 
-      html += `
+    html += `
+
       <div class="book-card">
 
-        <h3>${book.title}</h3>
+        <!-- BOOK COVER -->
 
-        <p>${book.author}</p>
+        <img
+          src="${book.cover}"
+          class="book-cover"
+          alt="${book.title}"
+          onerror="this.src='https://raw.githubusercontent.com/rajinikanthhc/images/main/Book%20Covers/default-book.png'"
+        >
 
-        <small>${book.category} • ${book.language}</small>
 
-        <br><br>
+        <!-- TITLE -->
 
-        <button onclick="window.open('${book.pdf}','_blank')">
+        <div class="book-title">
+          ${book.title}
+        </div>
 
-        📖 Read
+
+        <!-- AUTHOR -->
+
+        <div class="book-author">
+          ${book.author}
+        </div>
+
+
+        <!-- CATEGORY + LANGUAGE -->
+
+        <div class="book-meta">
+
+          <span class="category">
+            ${book.category}
+          </span>
+
+          <span class="language">
+            ${book.language == "English"
+              ? "🇬🇧 English"
+              : "🇮🇳 Kannada"}
+          </span>
+
+        </div>
+
+
+        <!-- READ BUTTON -->
+
+        <button
+          class="read-btn"
+          onclick="window.open('${book.pdf}', '_blank')">
+
+          📖 Read
 
         </button>
 
       </div>
-      `;
+
+    `;
 
   });
 
   document.getElementById("books").innerHTML = html;
+
+}
+
+
+/* =================================
+   SEARCH
+================================= */
+
+function searchBooks() {
+
+  const text = document
+    .getElementById("search")
+    .value
+    .toLowerCase()
+    .trim();
+
+
+  const filtered = books.filter(book =>
+
+    book.title.toLowerCase().includes(text) ||
+
+    book.author.toLowerCase().includes(text) ||
+
+    book.category.toLowerCase().includes(text)
+
+  );
+
+
+  renderBooks(filtered);
 
 }
 

@@ -5,33 +5,67 @@
 
   <base target="_top">
 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <?!= include("CSS"); ?>
 
 </head>
 
 <body>
 
-<div class="header">
+<header class="topbar">
 
-📚 Books Hub
+<div class="logo">
+
+📚 <span>Books Hub</span>
 
 </div>
 
-<div class="container">
+<div class="counter">
+
+  <span class="counter-icon">📚</span>
+
+  <span id="totalBooks">0</span>
+
+  <span class="counter-label">Books</span>
+
+</div>
+
+</header>
+
+
+<div class="search-area">
 
 <input
 type="text"
 id="search"
-placeholder="🔍 Search books..."
+placeholder="🔍 Search by title, author or category..."
 onkeyup="searchBooks()">
+
+</div>
+
 
 <div id="books">
 
-Loading Books...
+<div class="loading">
+
+    📚 Loading your library...
 
 </div>
 
 </div>
+
+
+<footer>
+
+Books Hub • Version 1.0
+
+</footer>
 
 <?!= include("JavaScript"); ?>
 
