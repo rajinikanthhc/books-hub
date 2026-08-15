@@ -280,38 +280,50 @@ function clearAddBookForm() {
     "bookTitle"
   ).value = "";
 
-
   document.getElementById(
     "bookAuthor"
   ).value = "";
-
 
   document.getElementById(
     "bookLanguage"
   ).value = "English";
 
-
   document.getElementById(
     "bookCategory"
   ).value = "";
-
 
   document.getElementById(
     "bookPdf"
   ).value = "";
 
-
   document.getElementById(
     "bookCover"
   ).value = "";
-
 
   document.getElementById(
     "uploadStatus"
   ).innerHTML = "";
 
-}
 
+  /* --------------------------------
+     RESET SAVE BUTTON
+  -------------------------------- */
+
+  const saveBtn =
+    document.getElementById(
+      "saveBookBtn"
+    );
+
+  if (saveBtn) {
+
+    saveBtn.disabled = false;
+
+    saveBtn.innerHTML =
+      "Save Book";
+
+  }
+
+}
 
 /* =================================
    SAVE BOOK
