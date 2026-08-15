@@ -20,3 +20,17 @@ function include(fileName){
     .getContent();
 
 }
+
+function authorizeBooksHub() {
+
+  const folder =
+    DriveApp.getFolderById(
+      CONFIG.BOOKS_FOLDER_ID
+    );
+
+  Logger.log(
+    "Books folder authorized: " +
+    folder.getName()
+  );
+
+}

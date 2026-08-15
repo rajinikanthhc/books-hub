@@ -5,69 +5,243 @@
 
   <base target="_top">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <?!= include("CSS"); ?>
 
 </head>
 
+
 <body>
+
 
 <header class="topbar">
 
-<div class="logo">
+  <div class="logo">
 
-📚 <span>Books Hub</span>
+    📚 <span>Books Hub</span>
 
-</div>
+  </div>
 
-<div class="counter">
 
-  <span class="counter-icon">📚</span>
+  <div class="header-right">
 
-  <span id="totalBooks">0</span>
+    <button
+      class="add-book-btn"
+      onclick="openAddBook()">
 
-  <span class="counter-label">Books</span>
+      ＋ Add Book
 
-</div>
+    </button>
+
+
+    <div class="counter">
+
+      <span class="counter-icon">📚</span>
+
+      <span id="totalBooks">0</span>
+
+      <span class="counter-label">
+        Books
+      </span>
+
+    </div>
+
+  </div>
 
 </header>
 
 
 <div class="search-area">
 
-<input
-type="text"
-id="search"
-placeholder="🔍 Search by title, author or category..."
-onkeyup="searchBooks()">
+  <input
+    type="text"
+    id="search"
+    placeholder="🔍 Search by title, author or category..."
+    onkeyup="searchBooks()">
 
 </div>
 
 
 <div id="books">
 
-<div class="loading">
+  <div class="loading">
 
     📚 Loading your library...
 
-</div>
+  </div>
 
 </div>
 
 
 <footer>
 
-Books Hub • Version 1.0
+  Books Hub • Version 1.0
 
 </footer>
 
+
+<!-- =================================
+     ADD BOOK MODAL
+================================= -->
+
+<div
+  id="addBookModal"
+  class="modal">
+
+
+  <div class="modal-box">
+
+
+    <div class="modal-header">
+
+      <h2>＋ Add Book</h2>
+
+      <button
+        class="close-btn"
+        onclick="closeAddBook()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Book Title *</label>
+
+      <input
+        type="text"
+        id="bookTitle"
+        placeholder="Enter book title">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Author</label>
+
+      <input
+        type="text"
+        id="bookAuthor"
+        placeholder="Enter author name">
+
+    </div>
+
+
+    <div class="form-row">
+
+      <div class="form-group">
+
+        <label>Language</label>
+
+        <select id="bookLanguage">
+
+          <option value="English">
+            English
+          </option>
+
+          <option value="Kannada">
+            Kannada
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Category</label>
+
+        <input
+          type="text"
+          id="bookCategory"
+          placeholder="Finance, Business...">
+
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Book PDF *</label>
+
+      <input
+        type="file"
+        id="bookPdf"
+        accept=".pdf,application/pdf">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Cover Image *</label>
+
+      <input
+        type="file"
+        id="bookCover"
+        accept="image/*">
+
+    </div>
+
+
+    <div
+      id="uploadStatus"
+      class="upload-status">
+    </div>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="cancel-btn"
+        onclick="closeAddBook()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        class="save-btn"
+        id="saveBookBtn"
+        onclick="saveBook()">
+
+        Save Book
+
+      </button>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
 <?!= include("JavaScript"); ?>
+
 
 </body>
 

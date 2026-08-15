@@ -10,7 +10,11 @@ let books = [];
 window.onload = function () {
 
   google.script.run
+
     .withSuccessHandler(showBooks)
+
+    .withFailureHandler(showError)
+
     .getBooks();
 
 };
@@ -22,11 +26,22 @@ window.onload = function () {
 
 function showBooks(data) {
 
-  books = data;
-
-  document.getElementById("totalBooks").innerHTML = data.length;
+  books = data || [];
 
   renderBooks(books);
+
+}
+
+
+/* =================================
+   BOOK COUNT
+================================= */
+
+function updateBookCount(count) {
+
+  document.getElementById(
+    "totalBooks"
+  ).innerHTML = count;
 
 }
 
@@ -37,7 +52,27 @@ function showBooks(data) {
 
 function renderBooks(list) {
 
+  updateBookCount(
+    list.length
+  );
+
   let html = "";
+
+
+  if (list.length === 0) {
+
+    html = `
+
+      <div class="no-books">
+
+        📚 No books found.
+
+      </div>
+
+    `;
+
+  }
+
 
   list.forEach(book => {
 
@@ -45,27 +80,52 @@ function renderBooks(list) {
 
       <div class="book-card">
 
-        <!-- BOOK COVER -->
+
+        <!-- DELETE -->
+
+        <button
+
+          class="delete-btn"
+
+          title="Delete book"
+
+          onclick="deleteBook(${book.id})">
+
+          🗑️
+
+        </button>
+
+
+        <!-- COVER -->
 
         <img
+
           src="${book.cover}"
+
           class="book-cover"
-          alt="${book.title}"
-          onerror="this.src='https://raw.githubusercontent.com/rajinikanthhc/images/main/Book%20Covers/default-book.png'"
-        >
+
+          alt="${escapeHtml(book.title)}"
+
+          onerror="this.src='https://raw.githubusercontent.com/rajinikanthhc/images/main/book-covers/Default%20Book.png'">
 
 
         <!-- TITLE -->
 
         <div class="book-title">
-          ${book.title}
+
+          ${escapeHtml(book.title)}
+
         </div>
 
 
         <!-- AUTHOR -->
 
         <div class="book-author">
-          ${book.author}
+
+          ${escapeHtml(
+            book.author || ""
+          )}
+
         </div>
 
 
@@ -74,26 +134,44 @@ function renderBooks(list) {
         <div class="book-meta">
 
           <span class="category">
-            ${book.category}
+
+            ${escapeHtml(
+              book.category || ""
+            )}
+
           </span>
 
+
           <span class="language">
-            ${book.language == "English"
-              ? "🇬🇧 English"
-              : "🇮🇳 Kannada"}
+
+            ${
+              book.language == "English"
+
+                ? "🇬🇧 English"
+
+                : "🇮🇳 Kannada"
+            }
+
           </span>
 
         </div>
 
-        <!-- READ BUTTON -->
+
+        <!-- READ -->
 
         <button
+
           class="read-btn"
-          onclick="window.open('${book.pdf}', '_blank')">
+
+          onclick="window.open(
+            '${book.pdf}',
+            '_blank'
+          )">
 
           📖 Read
 
         </button>
+
 
       </div>
 
@@ -101,7 +179,10 @@ function renderBooks(list) {
 
   });
 
-  document.getElementById("books").innerHTML = html;
+
+  document.getElementById(
+    "books"
+  ).innerHTML = html;
 
 }
 
@@ -112,25 +193,640 @@ function renderBooks(list) {
 
 function searchBooks() {
 
-  const text = document
-    .getElementById("search")
-    .value
-    .toLowerCase()
-    .trim();
+  const text =
+    document
+      .getElementById("search")
+      .value
+      .toLowerCase()
+      .trim();
 
 
-  const filtered = books.filter(book =>
+  const filtered =
+    books.filter(book =>
 
-    book.title.toLowerCase().includes(text) ||
+      (book.title || "")
+        .toLowerCase()
+        .includes(text)
 
-    book.author.toLowerCase().includes(text) ||
+      ||
 
-    book.category.toLowerCase().includes(text)
+      (book.author || "")
+        .toLowerCase()
+        .includes(text)
 
+      ||
+
+      (book.category || "")
+        .toLowerCase()
+        .includes(text)
+
+    );
+
+
+  renderBooks(
+    filtered
   );
 
+}
 
-  renderBooks(filtered);
+
+/* =================================
+   OPEN ADD BOOK
+================================= */
+
+function openAddBook() {
+
+  document
+    .getElementById(
+      "addBookModal"
+    )
+    .style.display = "flex";
+
+
+  document
+    .getElementById(
+      "bookTitle"
+    )
+    .focus();
+
+}
+
+
+/* =================================
+   CLOSE ADD BOOK
+================================= */
+
+function closeAddBook() {
+
+  document
+    .getElementById(
+      "addBookModal"
+    )
+    .style.display = "none";
+
+
+  clearAddBookForm();
+
+}
+
+
+/* =================================
+   CLEAR FORM
+================================= */
+
+function clearAddBookForm() {
+
+  document.getElementById(
+    "bookTitle"
+  ).value = "";
+
+
+  document.getElementById(
+    "bookAuthor"
+  ).value = "";
+
+
+  document.getElementById(
+    "bookLanguage"
+  ).value = "English";
+
+
+  document.getElementById(
+    "bookCategory"
+  ).value = "";
+
+
+  document.getElementById(
+    "bookPdf"
+  ).value = "";
+
+
+  document.getElementById(
+    "bookCover"
+  ).value = "";
+
+
+  document.getElementById(
+    "uploadStatus"
+  ).innerHTML = "";
+
+}
+
+
+/* =================================
+   SAVE BOOK
+================================= */
+
+async function saveBook() {
+
+  const title =
+    document
+      .getElementById(
+        "bookTitle"
+      )
+      .value
+      .trim();
+
+
+  const author =
+    document
+      .getElementById(
+        "bookAuthor"
+      )
+      .value
+      .trim();
+
+
+  const language =
+    document
+      .getElementById(
+        "bookLanguage"
+      )
+      .value;
+
+
+  const category =
+    document
+      .getElementById(
+        "bookCategory"
+      )
+      .value
+      .trim();
+
+
+  const pdfFile =
+    document
+      .getElementById(
+        "bookPdf"
+      )
+      .files[0];
+
+
+  const coverFile =
+    document
+      .getElementById(
+        "bookCover"
+      )
+      .files[0];
+
+
+  /* --------------------------------
+     VALIDATION
+  -------------------------------- */
+
+  if (!title) {
+
+    alert(
+      "Please enter the book title."
+    );
+
+    return;
+
+  }
+
+
+  if (!pdfFile) {
+
+    alert(
+      "Please select the book PDF."
+    );
+
+    return;
+
+  }
+
+
+  if (!coverFile) {
+
+    alert(
+      "Please select the cover image."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    pdfFile.type !==
+    "application/pdf"
+  ) {
+
+    alert(
+      "Please select a PDF file."
+    );
+
+    return;
+
+  }
+
+
+  /* --------------------------------
+     ANY IMAGE TYPE
+  -------------------------------- */
+
+  if (
+    !coverFile.type.startsWith(
+      "image/"
+    )
+  ) {
+
+    alert(
+      "Please select a valid image."
+    );
+
+    return;
+
+  }
+
+
+  /* --------------------------------
+     STATUS
+  -------------------------------- */
+
+  const saveBtn =
+    document.getElementById(
+      "saveBookBtn"
+    );
+
+
+  const status =
+    document.getElementById(
+      "uploadStatus"
+    );
+
+
+  saveBtn.disabled =
+    true;
+
+
+  saveBtn.innerHTML =
+    "Uploading...";
+
+
+  status.innerHTML =
+    "📚 Uploading PDF and cover...";
+
+
+  try {
+
+    const pdfData =
+      await fileToBase64(
+        pdfFile
+      );
+
+
+    const coverData =
+      await fileToBase64(
+        coverFile
+      );
+
+
+    const bookData = {
+
+      title:
+        title,
+
+      author:
+        author,
+
+      language:
+        language,
+
+      category:
+        category,
+
+      pdfName:
+        pdfFile.name,
+
+      pdfMimeType:
+        pdfFile.type,
+
+      pdfData:
+        pdfData,
+
+      /*
+         The original cover name is sent only
+         so Apps Script can detect extension.
+         The final GitHub name is automatically
+         created from the book title.
+      */
+
+      coverName:
+        coverFile.name,
+
+      coverMimeType:
+        coverFile.type,
+
+      coverData:
+        coverData
+
+    };
+
+
+    google.script.run
+
+      .withSuccessHandler(
+        function(result) {
+
+          status.innerHTML =
+            "✅ Book added successfully.";
+
+
+          closeAddBook();
+
+
+          google.script.run
+
+            .withSuccessHandler(
+              showBooks
+            )
+
+            .withFailureHandler(
+              showError
+            )
+
+            .getBooks();
+
+        }
+      )
+
+
+      .withFailureHandler(
+        function(error) {
+
+          saveBtn.disabled =
+            false;
+
+
+          saveBtn.innerHTML =
+            "Save Book";
+
+
+          status.innerHTML =
+            "";
+
+
+          alert(
+            "Unable to add book:\n\n" +
+            error.message
+          );
+
+        }
+      )
+
+
+      .addBook(
+        bookData
+      );
+
+  }
+
+
+  catch (error) {
+
+    saveBtn.disabled =
+      false;
+
+
+    saveBtn.innerHTML =
+      "Save Book";
+
+
+    alert(
+      "Upload failed:\n\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =================================
+   FILE TO BASE64
+================================= */
+
+function fileToBase64(
+  file
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function() {
+
+          const result =
+            reader.result;
+
+
+          const base64 =
+            result.split(",")[1];
+
+
+          resolve(
+            base64
+          );
+
+        };
+
+
+      reader.onerror =
+        function() {
+
+          reject(
+            new Error(
+              "Unable to read file."
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/* =================================
+   DELETE BOOK
+================================= */
+
+function deleteBook(id) {
+
+  const book =
+    books.find(
+      b =>
+        Number(b.id) ===
+        Number(id)
+    );
+
+
+  if (!book) {
+
+    return;
+
+  }
+
+
+  /* --------------------------------
+     FIRST CONFIRMATION
+  -------------------------------- */
+
+  const confirmed =
+    confirm(
+
+      "Delete this book?\n\n" +
+
+      book.title +
+
+      "\n\n" +
+
+      "The PDF will be moved to Drive Trash " +
+
+      "and the cover will be removed from GitHub."
+
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  /* --------------------------------
+     PASSCODE
+  -------------------------------- */
+
+  const passcode =
+    prompt(
+      "Enter delete passcode:"
+    );
+
+
+  if (
+    passcode === null
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    passcode.trim() === ""
+  ) {
+
+    alert(
+      "Delete cancelled."
+    );
+
+    return;
+
+  }
+
+
+  /* --------------------------------
+     DELETE
+  -------------------------------- */
+
+  google.script.run
+
+    .withSuccessHandler(
+      function() {
+
+        books =
+          books.filter(
+            b =>
+              Number(b.id) !==
+              Number(id)
+          );
+
+
+        searchBooks();
+
+      }
+    )
+
+
+    .withFailureHandler(
+      function(error) {
+
+        alert(
+          "Unable to delete book:\n\n" +
+          error.message
+        );
+
+      }
+    )
+
+
+    .deleteBook(
+      id,
+      passcode
+    );
+
+}
+
+
+/* =================================
+   ESCAPE HTML
+================================= */
+
+function escapeHtml(
+  text
+) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    text;
+
+
+  return div.innerHTML;
+
+}
+
+
+/* =================================
+   ERROR
+================================= */
+
+function showError(
+  error
+) {
+
+  document.getElementById(
+    "books"
+  ).innerHTML = `
+
+    <div class="no-books">
+
+      ❌ Unable to load books.
+
+      <br><br>
+
+      ${error.message}
+
+    </div>
+
+  `;
 
 }
 
